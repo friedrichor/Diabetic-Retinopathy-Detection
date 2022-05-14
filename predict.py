@@ -36,12 +36,13 @@ def main(args):
     model.load_state_dict(torch.load(model_weight_path, map_location=device))
     model.eval()
 
-
-    test_path = args.path_test
+    test_path = str(args.path_test) + '/'
 
     num_correct = 0
+    num_test_data = 0
     for cls in os.listdir(test_path):
         img_list = []
+        num_test_data += len(os.listdir(test_path + cls))
         for img_path in os.listdir(test_path + cls):
             img_path = test_path + cls + '/' + img_path
             assert os.path.exists(img_path), "file: '{}' dose not exist.".format(img_path)
@@ -69,7 +70,8 @@ def main(args):
                                                               predict[i].numpy()))
                     if predict[i].numpy() > 0.5 and class_indict[str(i)] == cls:
                         num_correct += 1
-    print('corr =', num_correct / len(os.listdir(test_path)))
+
+    print('corr =', num_correct / num_test_data)
     # plt.show()
 
 
