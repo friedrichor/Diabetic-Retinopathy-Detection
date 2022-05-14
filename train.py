@@ -13,20 +13,14 @@ from my_dataset import MyDataSet
 from vit_model import vit_base_patch16_224_in21k as create_model
 from utils import read_split_data, train_one_epoch, evaluate
 
-import sys
-from pathlib import Path
-FILE = Path(__file__).resolve()
-ROOT = FILE.parents[0]  # root directory
-if str(ROOT) not in sys.path:
-    sys.path.append(str(ROOT))  # add ROOT to PATH
-ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
+from params import *
 
 def main(args):
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     print('device =', device)
 
-    if os.path.exists("./weights") is False:
-        os.makedirs("./weights")
+    if os.path.exists(ROOT / 'weights') is False:
+        os.makedirs(ROOT / 'weights')
 
     tb_writer = SummaryWriter()
 
@@ -124,12 +118,12 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_classes', type=int, default=2)
-    parser.add_argument('--epochs', type=int, default=10)
+    parser.add_argument('--epochs', type=int, default=50)
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--lrf', type=float, default=0.01)
     # 数据集所在根目录
-    parser.add_argument('--data-path', type=str, default=ROOT / 'data/data_split/train')
+    parser.add_argument('--data-path', type=str, default=ROOT / path_train)
 
     parser.add_argument('--model-name', default='', help='create model name')
     # 预训练权重路径，如果不想载入就设置为空字符

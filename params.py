@@ -12,6 +12,7 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 num_classes = 2
 
 model = 'weights/model-15.pth'
+path_train = 'data/data_split/train_enh/'
 path_test = 'data/data_split/test/'
 path_json = 'class_indices.json'
 
