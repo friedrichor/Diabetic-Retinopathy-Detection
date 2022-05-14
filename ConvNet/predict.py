@@ -40,7 +40,7 @@ def main():
     # create model
     model = create_model(num_classes=num_classes).to(device)
     # load model weights
-    model_weight_path = "./weights/best_model.pth"
+    model_weight_path = "./weights/best_model2.pth"
     model.load_state_dict(torch.load(model_weight_path, map_location=device))
     model.eval()
 
@@ -87,8 +87,10 @@ def main():
                     TP += 1
                 if predict[1].numpy() > 0.5 and cls == '0-1':  # 本为0-1，判为2-3
                     FN += 1
+                    print('错了')
                 if predict[0].numpy() > 0.5 and cls == '2-3':  # 本为2-3，判为0-1
                     FP += 1
+                    print('错了')
                 if predict[1].numpy() > 0.5 and cls == '2-3':  # 本为2-3，判为2-3
                     TN += 1
 
@@ -102,6 +104,7 @@ def main():
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
     F1 = 2*precision*recall / (precision+recall)
+    print(TP, FN, FP, TP)
     print('准确率:', accuracy)
     print('精确率:', precision)
     print('召回率:', recall)
