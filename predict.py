@@ -29,15 +29,17 @@ def main():
     # num_class need to change due to number of classifications
     model = create_model(num_classes=2, has_logits=False).to(device)
     # load model weights
-    model_weight_path = "./weights/model-9.pth"
+    model_weight_path = "./weights/model-15.pth"
     model.load_state_dict(torch.load(model_weight_path, map_location=device))
     model.eval()
 
     # load image
     # img_path = "../tulip.jpg"
-    test_path = './data/train_pro/'
-    img_list = []
+    test_path = './data/data_split/test/'
+
+    num_correct = 0
     for cls in os.listdir(test_path):
+        img_list = []
         for img_path in os.listdir(test_path + cls):
             img_path = test_path + cls + '/' + img_path
             assert os.path.exists(img_path), "file: '{}' dose not exist.".format(img_path)
@@ -48,22 +50,24 @@ def main():
             # expand batch dimension
             img = torch.unsqueeze(img, dim=0)
             img_list.append(img)
-        break
 
-    with torch.no_grad():
-        # predict class
-        for img in img_list:
-            output = torch.squeeze(model(img.to(device))).cpu()
-            predict = torch.softmax(output, dim=0)
-            predict_cla = torch.argmax(predict).numpy()
+        with torch.no_grad():
+            # predict class
+            for img in img_list:
+                output = torch.squeeze(model(img.to(device))).cpu()
+                predict = torch.softmax(output, dim=0)
+                predict_cla = torch.argmax(predict).numpy()
 
-            print_res = "class: {}   prob: {:.3}".format(class_indict[str(predict_cla)],
-                                                         predict[predict_cla].numpy())
-            plt.title(print_res)
-            print(max(predict))
-            for i in range(len(predict)):
-                print("class: {:10}   prob: {:.3}".format(class_indict[str(i)],
-                                                          predict[i].numpy()))
+                print_res = "class: {}   prob: {:.3}".format(class_indict[str(predict_cla)],
+                                                             predict[predict_cla].numpy())
+                plt.title(print_res)
+                print(max(predict))
+                for i in range(len(predict)):
+                    print("class: {:10}   prob: {:.3}".format(class_indict[str(i)],
+                                                              predict[i].numpy()))
+                    if predict[i].numpy() > 0.5 and class_indict[str(i)] == cls:
+                        num_correct += 1
+    print('corr =', num_correct / 40)
     # plt.show()
 
 
