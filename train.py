@@ -13,6 +13,13 @@ from my_dataset import MyDataSet
 from vit_model import vit_base_patch16_224_in21k as create_model
 from utils import read_split_data, train_one_epoch, evaluate
 
+import sys
+from pathlib import Path
+FILE = Path(__file__).resolve()
+ROOT = FILE.parents[0]  # YOLOv5 root directory
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))  # add ROOT to PATH
+ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 def main(args):
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
@@ -122,15 +129,11 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--lrf', type=float, default=0.01)
     # 数据集所在根目录
-    # https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz
-    parser.add_argument('--data-path', type=str,
-                        default="./data/train_pro")  # 如果是相对路径前面加'.'
-    # parser.add_argument('--data-path', type=str,
-    #                     default="./data/flower_photos")
-    parser.add_argument('--model-name', default='', help='create model name')
+    parser.add_argument('--data-path', type=str, default=ROOT / 'data/data_split/train')
 
+    parser.add_argument('--model-name', default='', help='create model name')
     # 预训练权重路径，如果不想载入就设置为空字符
-    parser.add_argument('--weights', type=str, default='', # default='./vit_base_patch16_224_in21k.pth',
+    parser.add_argument('--weights', type=str, default=ROOT / 'vit_base_patch16_224_in21k.pth',
                         help='initial weights path')
     # 是否冻结权重
     parser.add_argument('--freeze-layers', type=bool, default=True)
