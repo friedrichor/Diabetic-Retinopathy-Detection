@@ -69,7 +69,7 @@ def main(args):
                                              num_workers=nw,
                                              collate_fn=val_dataset.collate_fn)
 
-    model = create_model(num_classes=5, has_logits=False).to(device)
+    model = create_model(num_classes=args.num_classes, has_logits=False).to(device)
 
     if args.weights != "":
         assert os.path.exists(args.weights), "weights file: '{}' not exist.".format(args.weights)
@@ -123,7 +123,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_classes', type=int, default=5)
+    parser.add_argument('--num_classes', type=int, default=2)
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--lr', type=float, default=0.001)
@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--model-name', default='', help='create model name')
     # 预训练权重路径，如果不想载入就设置为空字符
-    parser.add_argument('--weights', type=str, default=ROOT / 'vit_base_patch16_224_in21k.pth',
+    parser.add_argument('--weights', type=str, default=ROOT / '../drive/MyDrive/vit_base_patch16_224_in21k.pth',
                         help='initial weights path')
     # 是否冻结权重
     parser.add_argument('--freeze-layers', type=bool, default=True)
