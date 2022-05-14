@@ -1,5 +1,6 @@
 import os
 import json
+import argparse
 
 import torch
 from PIL import Image
@@ -7,10 +8,12 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 
 from vit_model import vit_base_patch16_224_in21k as create_model
+from params import *
 
 
-def main():
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+def main(args):
+    device = args.device
+    print('device =', device)
 
     data_transform = transforms.Compose(
         [transforms.Resize(256),
@@ -19,7 +22,7 @@ def main():
          transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
 
     # read class_indict
-    json_path = './class_indices.json'
+    json_path = args.path_json
     assert os.path.exists(json_path), "file: '{}' dose not exist.".format(json_path)
 
     with open(json_path, "r") as f:
@@ -27,15 +30,14 @@ def main():
 
     # create model
     # num_class need to change due to number of classifications
-    model = create_model(num_classes=2, has_logits=False).to(device)
+    model = create_model(num_classes=args.num_classes, has_logits=False).to(device)
     # load model weights
-    model_weight_path = "./weights/model-15.pth"
+    model_weight_path = args.weights
     model.load_state_dict(torch.load(model_weight_path, map_location=device))
     model.eval()
 
-    # load image
-    # img_path = "../tulip.jpg"
-    test_path = './data/data_split/test/'
+
+    test_path = args.path_test
 
     num_correct = 0
     for cls in os.listdir(test_path):
@@ -67,9 +69,23 @@ def main():
                                                               predict[i].numpy()))
                     if predict[i].numpy() > 0.5 and class_indict[str(i)] == cls:
                         num_correct += 1
-    print('corr =', num_correct / 40)
+    print('corr =', num_correct / len(os.listdir(test_path)))
     # plt.show()
 
 
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / model, help='model path(s)')  # 模型参数
+    parser.add_argument('--path_test', type=str, default=ROOT / path_test, help='test datasets path')  # 测试集路径
+    parser.add_argument('--path_json', type=str, default=ROOT / path_json, help='class_indice.json path')
+    parser.add_argument('--num_classes', type=int, default=num_classes, help='number of classes')
+    parser.add_argument('--device', default='cuda:0', help='device id (i.e. 0 or 0,1 or cpu)')
+
+    opt = parser.parse_args()
+    return opt
+
+
 if __name__ == '__main__':
-    main()
+    opt = parse_opt()
+
+    main(opt)
